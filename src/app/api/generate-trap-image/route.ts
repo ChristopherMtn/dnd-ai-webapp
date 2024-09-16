@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GenerateTrapImageRequest } from "@/app/types";
 import OpenAI from "openai";
 
 const configuration = { apiKey: process.env.OPENAI_API_KEY };
@@ -6,7 +7,8 @@ const openai = new OpenAI(configuration);
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageDescription } = await request.json();
+    const { imageDescription } =
+      (await request.json()) as GenerateTrapImageRequest;
 
     console.log("Received imageDescription:", imageDescription);
 

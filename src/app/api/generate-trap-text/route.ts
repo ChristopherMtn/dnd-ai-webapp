@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GenerateTrapTextRequest } from "@/app/types";
 import OpenAI from "openai";
 
 const configuration = { apiKey: process.env.OPENAI_API_KEY };
@@ -6,7 +7,7 @@ const openai = new OpenAI(configuration);
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    const { prompt } = (await request.json()) as GenerateTrapTextRequest;
 
     if (!prompt) {
       return NextResponse.json(

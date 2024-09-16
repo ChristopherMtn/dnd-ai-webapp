@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { GenerateTrapTextResponse } from "./types";
+import { GenerateTrapImageResponse } from "./types";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -31,7 +33,7 @@ export default function Home() {
         body: JSON.stringify({ prompt }),
       });
 
-      const textData = await textResponse.json();
+      const textData = (await textResponse.json()) as GenerateTrapTextResponse;
       console.log("Text Data:", textData);
       if (textResponse.ok) {
         setDescription(textData.description);
@@ -66,7 +68,8 @@ export default function Home() {
         body: JSON.stringify({ imageDescription }),
       });
 
-      const imageData = await imageResponse.json();
+      const imageData =
+        (await imageResponse.json()) as GenerateTrapImageResponse;
       if (imageResponse.ok) {
         setImageUrl(imageData.imageUrl);
       } else {
@@ -89,7 +92,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>DND Generator</h1>
+      <h1>AI DND Trap Generator</h1>
       <form onSubmit={handleGenerateContent}>
         <textarea
           value={prompt}
