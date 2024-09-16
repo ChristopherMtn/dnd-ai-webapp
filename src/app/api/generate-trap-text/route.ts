@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (!prompt) {
       return NextResponse.json(
-        { error: "Prompt is required" },
+        { error: "Text prompt is required" },
         { status: 400 }
       );
     }
@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
       model: "gpt-4o-mini",
     });
 
-    const result = response.choices[0].message.content;
+    const description = response.choices[0].message.content;
 
-    return NextResponse.json({ result }, { status: 200 });
+    return NextResponse.json({ description }, { status: 200 });
   } catch (error) {
     console.error("OpenAI API Error:", error);
     return NextResponse.json(
