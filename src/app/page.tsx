@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { GenerateTrapTextResponse } from "./types";
 import { GenerateTrapImageResponse } from "./types";
@@ -13,10 +13,10 @@ export default function Home() {
   const [loadingDescription, setLoadingDescription] = useState(false);
   const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState("");
-  const [dangerLevel, setDangerLevel] = useState<string | DangerLevel>("")
-  const [isMagical, setIsMagical] = useState<boolean>(false)
-  const [playerLevel, setPlayerLevel] = useState<number>(1)
-  const [location, setLocation] = useState<string>("")
+  const [dangerLevel, setDangerLevel] = useState<string | DangerLevel>("");
+  const [isMagical, setIsMagical] = useState<boolean>(false);
+  const [playerLevel, setPlayerLevel] = useState<number>(1);
+  const [location, setLocation] = useState<string>("");
 
   const handleGenerateContent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,42 +106,46 @@ export default function Home() {
           <select
             value={dangerLevel}
             onChange={(e) => setDangerLevel(e.target.value)}
-            disabled={loadingDescription}>
-              <option value="">-- Select a Danger Level --</option>
-              {Object.keys(DangerLevel).filter(key => isNaN(Number(key)))
+            disabled={loadingDescription}
+          >
+            <option value="">-- Select a Danger Level --</option>
+            {Object.keys(DangerLevel)
+              .filter((key) => isNaN(Number(key)))
               .map((key) => (
                 <option key={key} value={key}>
                   {key}
                 </option>
               ))}
-            </select>
+          </select>
         </label>
         <br />
         <label>
           Magical:
-          <span>   </span>
+          <span> </span>
           <input
             type="checkbox"
             checked={isMagical}
             onChange={(e) => setIsMagical(e.target.checked)}
-            disabled={loadingDescription}/>
+            disabled={loadingDescription}
+          />
         </label>
         <br />
         <label>
           Average Player Level:
-          <span>   </span>
+          <span> </span>
           <input
             type="number"
             value={playerLevel}
             onChange={(e) => setPlayerLevel(e.target.valueAsNumber)}
             disabled={loadingDescription}
             min={1}
-            max={20}/>
+            max={20}
+          />
         </label>
         <br />
         <label>
           Location:
-          <br/>
+          <br />
           <textarea
             value={location}
             onChange={(e) => setLocation(e.target.value)}
@@ -154,7 +158,7 @@ export default function Home() {
         <br />
         <label>
           Extra Info:
-          <br/>
+          <br />
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
