@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import Image from "next/image";
 import { GenerateTrapTextResponse } from "./types";
 import { GenerateTrapImageResponse } from "./types";
+import { DangerLevel } from "./types";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -12,6 +13,10 @@ export default function Home() {
   const [loadingDescription, setLoadingDescription] = useState(false);
   const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState("");
+  const [dangerLevel, setDangerLevel] = useState<string | DangerLevel>("")
+  const [isMagical, setIsMagical] = useState<boolean>(false)
+  const [playerLevel, setPlayerLevel] = useState<number>(1)
+  const [location, setLocation] = useState<string>("")
 
   const handleGenerateContent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,15 +98,72 @@ export default function Home() {
   return (
     <div style={{ padding: "20px" }}>
       <h1>AI DND Trap Generator</h1>
+      <br />
+      <u>Form:</u>
       <form onSubmit={handleGenerateContent}>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Enter your prompt here"
-          rows={6}
-          cols={60}
-          disabled={loadingDescription} // Disable input while loading description
-        />
+        <label>
+          Danger Level:
+          <select
+            value={dangerLevel}
+            onChange={(e) => setDangerLevel(e.target.value)}
+            disabled={loadingDescription}>
+              <option value="">-- Select a Danger Level --</option>
+              {Object.keys(DangerLevel).filter(key => isNaN(Number(key)))
+              .map((key) => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
+            </select>
+        </label>
+        <br />
+        <label>
+          Magical:
+          <span>   </span>
+          <input
+            type="checkbox"
+            checked={isMagical}
+            onChange={(e) => setIsMagical(e.target.checked)}
+            disabled={loadingDescription}/>
+        </label>
+        <br />
+        <label>
+          Average Player Level:
+          <span>   </span>
+          <input
+            type="number"
+            value={playerLevel}
+            onChange={(e) => setPlayerLevel(e.target.valueAsNumber)}
+            disabled={loadingDescription}
+            min={1}
+            max={20}/>
+        </label>
+        <br />
+        <label>
+          Location:
+          <br/>
+          <textarea
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Enter location info"
+            rows={3}
+            cols={60}
+            disabled={loadingDescription} // Disable input while loading description
+          />
+        </label>
+        <br />
+        <label>
+          Extra Info:
+          <br/>
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Enter any extra info"
+            rows={3}
+            cols={60}
+            disabled={loadingDescription} // Disable input while loading description
+          />
+        </label>
         <br />
         <button type="submit" disabled={loadingDescription || !prompt.trim()}>
           {loadingDescription

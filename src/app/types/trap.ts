@@ -1,4 +1,4 @@
-enum DangerLevel {
+export enum DangerLevel {
   Deterrent,
   Harmful,
   Lethal,
