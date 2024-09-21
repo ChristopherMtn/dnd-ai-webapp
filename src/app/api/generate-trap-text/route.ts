@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
         { role: "user", content: `${prompt}` },
       ],
       model: "gpt-4o-mini",
+      response_format: {"type": "json_object"},
     });
 
     const description = response.choices[0].message.content;

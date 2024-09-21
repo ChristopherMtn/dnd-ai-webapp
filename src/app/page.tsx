@@ -4,31 +4,76 @@ import { useState } from "react";
 import Image from "next/image";
 import { GenerateTrapTextResponse } from "./types";
 import { GenerateTrapImageResponse } from "./types";
-import { DangerLevel } from "./types";
+import { DangerLevel, TrapInput, TrapOutput } from "./types";
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
   const [description, setDescription] = useState("");
+  const [trapDisplay, setTrapDisplay] = useState<TrapOutput>({
+    description: "",
+    trigger: "",
+    countermeasures: "",
+    effect: "",
+  });
   const [imageUrl, setImageUrl] = useState("");
   const [loadingDescription, setLoadingDescription] = useState(false);
   const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState("");
-  const [dangerLevel, setDangerLevel] = useState<string | DangerLevel>("");
-  const [isMagical, setIsMagical] = useState<boolean>(false);
-  const [playerLevel, setPlayerLevel] = useState<number>(1);
-  const [location, setLocation] = useState<string>("");
+  const [trapInput, setTrapInput] = useState<TrapInput>({
+    magic: false,
+    dangerLevel: DangerLevel.Deterrent,
+    environment: "",
+    CharacterLevel: 1,
+    additionalDetail: "",
+  });
+  const { dangerLevel } = trapInput
+
+  const createPrompt = (trap: TrapInput) => {
+    const magic: string = trap.magic ? "magical" : "non-magical";
+    const characterLevel: string = trap.CharacterLevel.toString();
+    let danger: string = "";
+    switch (trap.dangerLevel) {
+      case DangerLevel.Deterrent:
+        danger = "deter but not harm";
+        break;
+      case DangerLevel.Harmful:
+        danger = "harm but not kill";
+        break;
+      case DangerLevel.Lethal:
+        danger = "potentially kill";
+        break;
+    }
+    let prompt: string = `
+      Create a ${magic} trap for D&D 5e that is appropriate for a party of level ${characterLevel} characters.
+      The trap should be designed to ${danger} players.`;
+    if (trap.environment.trim() != "") {
+      prompt = prompt + `\nInformation about where the trap is: ${trap.environment}`;
+    }
+    if (trap.additionalDetail.trim() != "") {
+      prompt = prompt + `\nAdditional details: ${trap.additionalDetail}`;
+    }
+    prompt = prompt + `\nRespond with a simple, un-nested JSON object in the following format: {"description":"example text", "trigger":"example text", "countermeasures":"example text", "effect":"example text"}`;
+    return prompt
+  }
 
   const handleGenerateContent = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoadingDescription(true);
     setError("");
     setDescription("");
+    setTrapDisplay({
+      description: "",
+      trigger: "",
+      countermeasures: "",
+      effect: "",
+    });
     setImageUrl("");
     setLoadingImage(false);
 
     let descriptionText = "";
 
     try {
+      const prompt: string = createPrompt(trapInput);
+      console.log(prompt)
       // Generate Description
       const textResponse = await fetch("/api/generate-trap-text", {
         method: "POST",
@@ -39,9 +84,18 @@ export default function Home() {
       });
 
       const textData = (await textResponse.json()) as GenerateTrapTextResponse;
-      console.log("Text Data:", textData);
+      let trapData: TrapOutput = {
+        description: "",
+        trigger: "",
+        countermeasures: "",
+        effect: "",
+      };
       if (textResponse.ok) {
+        console.log("output:", textData.description);
         setDescription(textData.description);
+        descriptionText = textData.description;
+        trapData = JSON.parse(textData.description)
+        setTrapDisplay(trapData);
         descriptionText = textData.description;
       } else {
         console.error("Error from text API:", textData.error);
@@ -95,6 +149,35 @@ export default function Home() {
     }
   };
 
+  const updateTrapInput = <K extends keyof TrapInput>(key: K, value: TrapInput[K]) => {
+    setTrapInput((prevState) => ({
+      ...prevState,
+      [key]: value,
+    }));
+  };
+
+  const handleDangerLevelChange = (newLevel: string) => {
+    if (newLevel in DangerLevel) {
+      updateTrapInput("dangerLevel", newLevel as DangerLevel);
+    }
+  };
+
+  const handleMagicalCheck = (newValue: boolean) => {
+    updateTrapInput("magic", newValue)
+  }
+
+  const handlePlayerLevelChange = (newLevel: number) => {
+    updateTrapInput("CharacterLevel", newLevel);
+  };
+
+  const handleLocationChange = (newEnvironment: string) => {
+    updateTrapInput("environment", newEnvironment);
+  };
+
+  const handleExtraInfoChange = (newInfo: string) => {
+    updateTrapInput("additionalDetail", newInfo);
+  }
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>AI DND Trap Generator</h1>
@@ -105,7 +188,7 @@ export default function Home() {
           Danger Level:
           <select
             value={dangerLevel}
-            onChange={(e) => setDangerLevel(e.target.value)}
+            onChange={(e) => handleDangerLevelChange(e.target.value)}
             disabled={loadingDescription}
           >
             <option value="">-- Select a Danger Level --</option>
@@ -124,8 +207,8 @@ export default function Home() {
           <span> </span>
           <input
             type="checkbox"
-            checked={isMagical}
-            onChange={(e) => setIsMagical(e.target.checked)}
+            checked={trapInput.magic}
+            onChange={(e) => handleMagicalCheck(e.target.checked)}
             disabled={loadingDescription}
           />
         </label>
@@ -135,8 +218,8 @@ export default function Home() {
           <span> </span>
           <input
             type="number"
-            value={playerLevel}
-            onChange={(e) => setPlayerLevel(e.target.valueAsNumber)}
+            value={trapInput.CharacterLevel}
+            onChange={(e) => handlePlayerLevelChange(e.target.valueAsNumber)}
             disabled={loadingDescription}
             min={1}
             max={20}
@@ -147,8 +230,8 @@ export default function Home() {
           Location:
           <br />
           <textarea
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            value={trapInput.environment}
+            onChange={(e) => handleLocationChange(e.target.value)}
             placeholder="Enter location info"
             rows={3}
             cols={60}
@@ -160,8 +243,8 @@ export default function Home() {
           Extra Info:
           <br />
           <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            value={trapInput.additionalDetail}
+            onChange={(e) => handleExtraInfoChange(e.target.value)}
             placeholder="Enter any extra info"
             rows={3}
             cols={60}
@@ -169,7 +252,7 @@ export default function Home() {
           />
         </label>
         <br />
-        <button type="submit" disabled={loadingDescription || !prompt.trim()}>
+        <button type="submit" disabled={loadingDescription}>
           {loadingDescription
             ? "Generating Description..."
             : "Generate Content"}

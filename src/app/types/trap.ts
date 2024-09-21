@@ -1,11 +1,11 @@
 export enum DangerLevel {
-  Deterrent,
-  Harmful,
-  Lethal,
+  Deterrent = "Deter",
+  Harmful = "Harm",
+  Lethal = "Kill",
 }
 
 export interface TrapInput {
-  magicOrMechanic: boolean;
+  magic: boolean;
   dangerLevel: DangerLevel;
   environment: string;
   CharacterLevel: number;
@@ -13,8 +13,8 @@ export interface TrapInput {
 }
 
 export interface TrapOutput {
-  description: JSON;
-  trigger: JSON;
-  countermeasures: JSON;
-  effect: JSON;
+  description: string;
+  trigger: string;
+  countermeasures: string;
+  effect: string;
 }
