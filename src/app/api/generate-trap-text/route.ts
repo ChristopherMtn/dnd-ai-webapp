@@ -1,35 +1,95 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GenerateTrapTextRequest } from "@/app/types";
+import { TrapInput, DangerLevel } from "@/app/types";
 import OpenAI from "openai";
+import { trapPromptTemplate } from "@/app/prompt_templates/trap";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 const configuration = { apiKey: process.env.OPENAI_API_KEY };
 const openai = new OpenAI(configuration);
 
+function createDangerDescription(dangerLevel: DangerLevel): string {
+  switch (dangerLevel) {
+    case DangerLevel.Deterrent:
+      return "deter but not harm";
+    case DangerLevel.Harmful:
+      return "harm but not kill";
+    case DangerLevel.Lethal:
+      return "potentially kill";
+    default:
+      return "";
+  }
+}
+
+function formatPrompt(
+  templateLines: string[],
+  data: Record<string, string>
+): string {
+  return templateLines
+    .map((line) => {
+      let formattedLine = line;
+      for (const key in data) {
+        const regex = new RegExp(`{${key}}`, "g");
+        formattedLine = formattedLine.replace(regex, data[key]);
+      }
+      return formattedLine;
+    })
+    .filter((line) => line.trim() !== "")
+    .join("\n");
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = (await request.json()) as GenerateTrapTextRequest;
+    const { trapInput } = (await request.json()) as { trapInput: TrapInput };
 
-    if (!prompt) {
+    if (!trapInput) {
       return NextResponse.json(
-        { error: "Text prompt is required" },
+        { error: "Trap input is required" },
         { status: 400 }
       );
     }
 
+    const { system_prompt, prompt_template, json_format } = trapPromptTemplate;
+
+    // Build the prompt data
+    const magic = trapInput.magic ? "magical" : "non-magical";
+    const danger = createDangerDescription(trapInput.dangerLevel);
+    const environment =
+      trapInput.environment.trim() !== ""
+        ? `Information about where the trap is: ${trapInput.environment}`
+        : "";
+    const additionalDetail =
+      trapInput.additionalDetail.trim() !== ""
+        ? `Additional details: ${trapInput.additionalDetail}`
+        : "";
+
+    const promptVariables = {
+      magic,
+      CharacterLevel: trapInput.CharacterLevel.toString(),
+      danger,
+      environment,
+      additionalDetail,
+      json_format,
+    };
+
+    const userPrompt: string = formatPrompt(prompt_template, promptVariables);
+
+    const messages: ChatCompletionMessageParam[] = [
+      {
+        role: "system",
+        content: system_prompt,
+      },
+      {
+        role: "user",
+        content: userPrompt,
+      },
+    ];
+
     const response = await openai.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an AI specialized in Dungeons and Dragons, who is very creative at generating traps.",
-        },
-        { role: "user", content: `${prompt}` },
-      ],
-      model: "gpt-4o-mini",
-      response_format: {"type": "json_object"},
+      model: "gpt-4",
+      messages: messages,
     });
 
-    const description = response.choices[0].message.content;
+    const description = response.choices[0].message?.content || "";
 
     return NextResponse.json({ description }, { status: 200 });
   } catch (error) {

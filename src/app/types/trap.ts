@@ -1,7 +1,7 @@
 export enum DangerLevel {
-  Deterrent = "Deter",
-  Harmful = "Harm",
-  Lethal = "Kill",
+  Deterrent = "Deterrent",
+  Harmful = "Harmful",
+  Lethal = "Lethal",
 }
 
 export interface TrapInput {
