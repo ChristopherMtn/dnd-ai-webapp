@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { TrapInput, DangerLevel } from "@/app/types";
+import { TrapInput, TrapOutput, DangerLevel } from "@/app/types";
 import OpenAI from "openai";
 import { trapPromptTemplate } from "@/app/prompt_templates/trap";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
@@ -87,11 +87,26 @@ export async function POST(request: NextRequest) {
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: messages,
+      temperature: 0.7,
     });
 
     const description = response.choices[0].message?.content || "";
 
-    return NextResponse.json({ description }, { status: 200 });
+    console.log(`Generated trap description: ${description}`);
+
+    // Parse the OpenAI response into a TrapOutput object
+    let trapOutput: TrapOutput;
+    try {
+      trapOutput = JSON.parse(description);
+    } catch (err) {
+      console.error("Error parsing OpenAI response:", err);
+      return NextResponse.json(
+        { error: "Invalid response from OpenAI" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ trapOutput }, { status: 200 });
   } catch (error) {
     console.error("OpenAI API Error:", error);
     return NextResponse.json(

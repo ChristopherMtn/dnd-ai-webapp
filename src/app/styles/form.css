@@ -1,0 +1,79 @@
+/* styles/form.css */
+
+/* Style for the form container */
+.form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Style for form headings */
+.form h1 {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Style for form labels */
+.form label {
+  display: block;
+  margin-bottom: 15px;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+/* Style for input fields */
+.form input[type="text"],
+.form input[type="number"],
+.form select,
+.form textarea {
+  width: 100%;
+  padding: 10px;
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 5px;
+  font-size: 16px;
+}
+
+/* Style for checkbox */
+.form input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+/* Style for the submit button */
+.form button {
+  background-color: #28a745;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+/* Hover effect for the button */
+.form button:hover {
+  background-color: #218838;
+}
+
+/* Disabled button style */
+.form button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Optional: Style for error messages */
+.form .error {
+  color: #ff0000;
+  margin-top: 10px;
+}
+
+/* Adjust spacing between form elements */
+.form input,
+.form select,
+.form textarea {
+  margin-bottom: 15px;
+}

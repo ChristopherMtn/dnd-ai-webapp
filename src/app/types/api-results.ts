@@ -1,10 +1,12 @@
+import { TrapInput, TrapOutput } from "./trap";
+
 export interface GenerateTrapTextRequest {
-  prompt: string;
+  trapInput: TrapInput;
 }
 
 export interface GenerateTrapTextResponse {
-  description: string;
-  error: string;
+  trapOutput: TrapOutput;
+  error?: string;
 }
 
 export interface GenerateTrapImageRequest {
@@ -12,6 +14,6 @@ export interface GenerateTrapImageRequest {
 }
 
 export interface GenerateTrapImageResponse {
-  imageUrl: string;
-  error: string;
+  imageUrls: string[];
+  error?: string;
 }

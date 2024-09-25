@@ -1,18 +1,18 @@
-enum Rarity {
-  Common,
-  Uncommon,
-  Rare,
-  Very_Rare,
-  Legendary,
-  Artifact,
+export enum Rarity {
+  Common = "Common",
+  Uncommon = "Uncommon",
+  Rare = "Rare",
+  Very_Rare = "Very Rare",
+  Legendary = "Legendary",
+  Artifact = "Artifact",
 }
 
-enum PresetItemType {
-  Weapon,
-  Trinket,
-  Armour,
-  Shield,
-  Spellcasting_Focus,
+export enum PresetItemType {
+  Weapon = "Weapon",
+  Trinket = "Trinket",
+  Armour = "Armour",
+  Shield = "Shield",
+  Spellcasting_Focus = "Spellcasting Focus",
 }
 
 export interface MagicItemInput {

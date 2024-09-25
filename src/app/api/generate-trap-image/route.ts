@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GenerateTrapImageRequest } from "@/app/types";
 import OpenAI from "openai";
+import { trapImageDims } from "@/app/prompt_templates/trap";
+import { ImageGenerateParams } from "openai/resources/images.mjs";
 
 const configuration = { apiKey: process.env.OPENAI_API_KEY };
 const openai = new OpenAI(configuration);
@@ -20,19 +22,20 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await openai.images.generate({
-      prompt: `A picture of the trap in Dungeons and Dragons style: ${imageDescription}`,
+      prompt: `In a dungeons and dragons art style: ${imageDescription}`,
       n: 1,
-      size: "1024x1024",
+      size: `${trapImageDims.width}x${trapImageDims.height}` as ImageGenerateParams["size"],
       model: "dall-e-3",
     });
 
-    const imageUrl = response.data[0].url;
+    // Collect all image URLs
+    const imageUrls = response.data.map((item) => item.url);
 
-    return NextResponse.json({ imageUrl }, { status: 200 });
+    return NextResponse.json({ imageUrls }, { status: 200 });
   } catch (error) {
     console.error("OpenAI API Error:", error);
     return NextResponse.json(
-      { error: "An error occurred while generating the response" },
+      { error: "An error occurred while generating the images" },
       { status: 500 }
     );
   }

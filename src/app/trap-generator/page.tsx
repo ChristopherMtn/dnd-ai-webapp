@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { GenerateTrapTextResponse } from "./types";
-import { GenerateTrapImageResponse } from "./types";
-import { DangerLevel, TrapInput, TrapOutput } from "./types";
+import { GenerateTrapTextResponse, GenerateTrapImageResponse } from "../types";
+import { DangerLevel, TrapInput, TrapOutput } from "../types";
+import { trapImageDims } from "../prompt_templates/trap";
+import "../styles/form.css";
 
-export default function Home() {
-  const [, setDescription] = useState("");
+export default function TrapGenerator() {
   const [trapDisplay, setTrapDisplay] = useState<TrapOutput>({
     description: "",
     trigger: "",
     countermeasures: "",
     effect: "",
   });
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]); // Changed from imageUrl to imageUrls
   const [loadingDescription, setLoadingDescription] = useState(false);
   const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState("");
@@ -31,17 +31,16 @@ export default function Home() {
     e.preventDefault();
     setLoadingDescription(true);
     setError("");
-    setDescription("");
     setTrapDisplay({
       description: "",
       trigger: "",
       countermeasures: "",
       effect: "",
     });
-    setImageUrl("");
+    setImageUrls([]); // Reset image URLs
     setLoadingImage(false);
 
-    let descriptionText = "";
+    let textData: GenerateTrapTextResponse;
 
     try {
       // Send the trapInput directly to the API
@@ -53,19 +52,11 @@ export default function Home() {
         body: JSON.stringify({ trapInput }),
       });
 
-      const textData = (await textResponse.json()) as GenerateTrapTextResponse;
-      let trapData: TrapOutput = {
-        description: "",
-        trigger: "",
-        countermeasures: "",
-        effect: "",
-      };
+      textData = (await textResponse.json()) as GenerateTrapTextResponse;
+
       if (textResponse.ok) {
-        console.log("output:", textData.description);
-        setDescription(textData.description);
-        descriptionText = textData.description;
-        trapData = JSON.parse(textData.description);
-        setTrapDisplay(trapData);
+        console.log("output:", textData.trapOutput);
+        setTrapDisplay(textData.trapOutput);
       } else {
         console.error("Error from text API:", textData.error);
         setError(textData.error || "An error occurred during text generation.");
@@ -81,13 +72,11 @@ export default function Home() {
       setLoadingDescription(false);
     }
 
-    // Use textData.description directly
-    const imageDescription = descriptionText;
-
-    // After description is set, start generating the image
+    // After description is set, start generating the images
     setLoadingImage(true);
     try {
-      // Generate Image using the Description
+      const imageDescription = textData.trapOutput.description;
+      // Generate Images using the Description
       const imageResponse = await fetch("/api/generate-trap-image", {
         method: "POST",
         headers: {
@@ -99,7 +88,7 @@ export default function Home() {
       const imageData =
         (await imageResponse.json()) as GenerateTrapImageResponse;
       if (imageResponse.ok) {
-        setImageUrl(imageData.imageUrl);
+        setImageUrls(imageData.imageUrls); // Set image URLs
       } else {
         console.error("Error from image API:", imageData.error);
         setError(
@@ -151,10 +140,8 @@ export default function Home() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="form">
       <h1>AI DND Trap Generator</h1>
-      <br />
-      <u>Form:</u>
       <form onSubmit={handleGenerateContent}>
         <label>
           Danger Level:
@@ -173,21 +160,19 @@ export default function Home() {
               ))}
           </select>
         </label>
-        <br />
+
         <label>
-          Magical:
-          <span> </span>
           <input
             type="checkbox"
             checked={trapInput.magic}
             onChange={(e) => handleMagicalCheck(e.target.checked)}
             disabled={loadingDescription}
           />
+          Magical
         </label>
-        <br />
+
         <label>
           Average Player Level:
-          <span> </span>
           <input
             type="number"
             value={trapInput.CharacterLevel}
@@ -197,40 +182,38 @@ export default function Home() {
             max={20}
           />
         </label>
-        <br />
+
         <label>
           Location:
-          <br />
           <textarea
             value={trapInput.environment}
             onChange={(e) => handleLocationChange(e.target.value)}
             placeholder="Enter location info"
             rows={3}
-            cols={60}
             disabled={loadingDescription}
           />
         </label>
-        <br />
+
         <label>
           Extra Info:
-          <br />
           <textarea
             value={trapInput.additionalDetail}
             onChange={(e) => handleExtraInfoChange(e.target.value)}
             placeholder="Enter any extra info"
             rows={3}
-            cols={60}
             disabled={loadingDescription}
           />
         </label>
-        <br />
+
         <button type="submit" disabled={loadingDescription}>
           {loadingDescription
             ? "Generating Description..."
             : "Generate Content"}
         </button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {error && <p className="error">{error}</p>}
+
       {trapDisplay.description && (
         <div>
           <h2>Trap Details:</h2>
@@ -248,9 +231,10 @@ export default function Home() {
           </p>
         </div>
       )}
+
       {loadingImage && (
         <div>
-          <p>Generating image...</p>
+          <p>Generating images...</p>
           <div
             style={{
               border: "4px solid rgba(0, 0, 0, 0.1)",
@@ -264,15 +248,29 @@ export default function Home() {
           ></div>
         </div>
       )}
-      {imageUrl && (
+
+      {imageUrls.length > 0 && (
         <div>
-          <h2>Image:</h2>
-          <Image
-            src={imageUrl}
-            alt="Generated DND-style Trap"
-            width={1024}
-            height={1024}
-          />
+          <h2>Images:</h2>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "10px",
+              flexWrap: "wrap", // Allow wrapping if there are too many images
+            }}
+          >
+            {imageUrls.map((url, index) => (
+              <Image
+                key={index}
+                src={url}
+                alt={`Generated DND-style Trap ${index + 1}`}
+                width={trapImageDims.width}
+                height={trapImageDims.height}
+                style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
