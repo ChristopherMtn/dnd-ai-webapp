@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       prompt: `In a dungeons and dragons art style: ${imageDescription}`,
       n: 1,
       size: `${trapImageDims.width}x${trapImageDims.height}` as ImageGenerateParams["size"],
-      model: "dall-e-3",
+      model: "dall-e-2",
     });
 
     // Collect all image URLs

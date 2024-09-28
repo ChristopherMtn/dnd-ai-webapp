@@ -23,13 +23,13 @@ const trapOutputExample: TrapOutput = {
 const json_format = generateJsonFormat(trapOutputExample);
 
 export const trapPromptTemplate = {
-  system_prompt: `You are an AI specialized in Dungeons and Dragons, who is very creative at generating interesting and engaging traps. You ensure the description of the trap is simple and visual so that it can be passed to an AI model to generate an image.`,
+  system_prompt: `You are an AI specialized in Dungeons and Dragons, who is very creative at generating interesting and engaging traps. You ensure the description of the trap is simple and visual so that it can be passed to an AI model to generate an image. Return a JSON object without adding Markdown formatting (such as backticks or \`\`\`json). Only provide valid raw JSON code.`,
   prompt_template: [
     "Create a {magic} trap for D&D 5e that is appropriate for a party of level {CharacterLevel} characters.",
     "The trap should be designed to {danger} players.",
     "Environment: {environment}",
     "Additional Detail: {additionalDetail}",
-    "Respond with a simple JSON object in the format of the following example: {json_format}",
+    "Example output: {json_format}",
   ],
   json_format,
 };
