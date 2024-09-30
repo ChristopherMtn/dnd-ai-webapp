@@ -170,6 +170,86 @@ export default function MagicItemGenerator() {
     updateMagicItemInput("additionalDetail", newDetail);
   };
 
+  const handleLessPowerful = async () => {
+    if (!magicItemDisplay) {
+      console.log(
+        "[WARNING] handleLessPowerful triggered but magic item display object is not set"
+      );
+      return;
+    }
+    setLoadingDescription(true);
+    setError("");
+
+    let textData: { magicItemOutput: MagicItemOutput; error?: string };
+
+    try {
+      const textResponse = await fetch("/api/generate-less-magic-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...magicItemDisplay }),
+      });
+
+      textData = await textResponse.json();
+
+      if (textResponse.ok) {
+        setMagicItemDisplay(textData.magicItemOutput);
+      } else {
+        setError(textData.error || "An error occurred during text generation.");
+        setLoadingDescription(false);
+        return;
+      }
+    } catch (err) {
+      console.error("Error during content generation:", err);
+      setError("An unexpected error occurred.");
+      setLoadingDescription(false);
+      return;
+    } finally {
+      setLoadingDescription(false);
+    }
+  };
+
+  const handleMorePowerful = async () => {
+    if (!magicItemDisplay) {
+      console.log(
+        "[WARNING] handleMorePowerful triggered but magic item display object is not set"
+      );
+      return;
+    }
+    setLoadingDescription(true);
+    setError("");
+
+    let textData: { magicItemOutput: MagicItemOutput; error?: string };
+    JSON.stringify(magicItemDisplay);
+    try {
+      const textResponse = await fetch("/api/generate-more-magic-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...magicItemDisplay }),
+      });
+
+      textData = await textResponse.json();
+
+      if (textResponse.ok) {
+        setMagicItemDisplay(textData.magicItemOutput);
+      } else {
+        setError(textData.error || "An error occurred during text generation.");
+        setLoadingDescription(false);
+        return;
+      }
+    } catch (err) {
+      console.error("Error during content generation:", err);
+      setError("An unexpected error occurred.");
+      setLoadingDescription(false);
+      return;
+    } finally {
+      setLoadingDescription(false);
+    }
+  };
+
   return (
     <div className="form">
       <h1>AI DND Magic Item Generator</h1>
@@ -345,8 +425,22 @@ export default function MagicItemGenerator() {
             {magicItemDisplay.abilitiesAndEffects}
           </p>
           <div className="modify-buttons">
-            <button id="less-button">&#x2212; Less Powerful</button>
-            <button id="more-button">More Powerful &#x2b;</button>
+            <button
+              id="less-button"
+              type="button"
+              onClick={handleLessPowerful}
+              disabled={loadingDescription}
+            >
+              &#x2212; Less Powerful
+            </button>
+            <button
+              id="more-button"
+              type="button"
+              onClick={handleMorePowerful}
+              disabled={loadingDescription}
+            >
+              More Powerful &#x2b;
+            </button>
           </div>
         </div>
       )}

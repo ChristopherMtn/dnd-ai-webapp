@@ -46,6 +46,16 @@ export const magicItemPromptTemplate = {
     "Example output: {json_format}",
   ],
   json_format,
+  less_powerful_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the rarity, description, item type, item purpose, and abilities/effects of a magic item, create a slightly less powerful verison of the same item. Return a JSON object without Markdown formatting. Only provide valid raw JSON code.`,
+  more_powerful_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the rarity, description, item type, item purpose, and abilities/effects of a magic item, create a slightly more powerful verison of the same item. Return a JSON object without Markdown formatting. Only provide valid raw JSON code.`,
+  power_prompt_template: [
+    "Rarity: {rarity}",
+    "Description: {description}",
+    "Item Type: {itemType}",
+    "Item Purpose: {itemPurpose}",
+    "Abilities/Effects: {abilitiesAndEffects}",
+    "Example output: {json_format}",
+  ],
 };
 
 export const imagePromptTemplate =
@@ -94,6 +104,50 @@ export function generateMagicItemTextPrompts(
   );
 
   const systemPrompt = magicItemPromptTemplate.system_prompt;
+  return { systemPrompt, userPrompt };
+}
+
+export function generateMagicItemLessPowerfulTextPrompts(
+  magicItemLessInput: MagicItemOutput
+) {
+  const { rarity, description, itemType, itemPurpose, abilitiesAndEffects } =
+    magicItemLessInput;
+  const data: Record<string, string> = {
+    rarity: rarity,
+    description: description,
+    itemType: itemType,
+    itemPurpose: itemPurpose,
+    abilitiesAndEffects: abilitiesAndEffects,
+    json_format: magicItemPromptTemplate.json_format,
+  };
+
+  const userPrompt = formatPrompt(
+    magicItemPromptTemplate.power_prompt_template,
+    data
+  );
+  const systemPrompt = magicItemPromptTemplate.less_powerful_system_prompt;
+  return { systemPrompt, userPrompt };
+}
+
+export function generateMagicItemMorePowerfulTextPrompts(
+  magicItemMoreInput: MagicItemOutput
+) {
+  const { rarity, description, itemType, itemPurpose, abilitiesAndEffects } =
+    magicItemMoreInput;
+  const data: Record<string, string> = {
+    rarity: rarity,
+    description: description,
+    itemType: itemType,
+    itemPurpose: itemPurpose,
+    abilitiesAndEffects: abilitiesAndEffects,
+    json_format: magicItemPromptTemplate.json_format,
+  };
+
+  const userPrompt = formatPrompt(
+    magicItemPromptTemplate.power_prompt_template,
+    data
+  );
+  const systemPrompt = magicItemPromptTemplate.more_powerful_system_prompt;
   return { systemPrompt, userPrompt };
 }
 
