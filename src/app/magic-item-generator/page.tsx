@@ -344,6 +344,10 @@ export default function MagicItemGenerator() {
             <strong>Abilities and Effects:</strong>{" "}
             {magicItemDisplay.abilitiesAndEffects}
           </p>
+          <div className="modify-buttons">
+            <button id="less-button">&#x2212; Less Powerful</button>
+            <button id="more-button">More Powerful &#x2b;</button>
+          </div>
         </div>
       )}
 

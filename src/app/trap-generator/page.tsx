@@ -230,6 +230,10 @@ export default function TrapGenerator() {
           <p>
             <strong>Effect:</strong> {trapDisplay.effect}
           </p>
+          <div className="modify-buttons">
+            <button id="less-button">&#x2212; Less Dangerous</button>
+            <button id="more-button">More Dangerous &#x2b;</button>
+          </div>
         </div>
       )}
 

@@ -77,3 +77,16 @@
 .form textarea {
   margin-bottom: 15px;
 }
+
+.modify-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 200px; /* Adjust gap between buttons */
+}
+
+#less-button,
+#more-button {
+  padding: 10px;
+  border-radius: 5px;
+}
