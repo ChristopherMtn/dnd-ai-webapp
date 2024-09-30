@@ -11,7 +11,7 @@ export enum CreatureCategory {
   Monstrosity,
   Ooze,
   Plant,
-  Undead
+  Undead,
 }
 
 export enum CreatureSize {
@@ -88,7 +88,7 @@ export enum Sense {
   Blindsight,
   Darkvision,
   Tremorsense,
-  Truesight
+  Truesight,
 }
 
 export enum DamageTypes {
@@ -109,7 +109,7 @@ export enum DamageTypes {
 
 export enum AttackType {
   Melee,
-  Ranged
+  Ranged,
 }
 
 export enum Dice {
@@ -131,7 +131,7 @@ type CreatureSpeeds = {
   fly: number;
   swim: number;
   burrow: number;
-}
+};
 
 type CreatureStats = {
   // bounded [1,30]
@@ -141,30 +141,30 @@ type CreatureStats = {
   int: number;
   wis: number;
   cha: number;
-}
+};
 export function getModifierFromStat(stat: number): number {
-  return Math.floor((stat - 10)/2)
+  return Math.floor((stat - 10) / 2);
 }
 
 type CreatureSkill = {
   // TODO: we need to decide how to handle skill modifiers. They're based on two things, the monster's proficiency bonus, and the relevant stat.
   // If we calculate them then this will always be the case. However, sometimes as a DM I find I like to break this rule and just choose the value to be whatever fits.
   // So we need to decide if these can be decoupled from proficiency bonus and stats, meaning the user could pick any number value, or if they just check a box to say the monster is proficient.
-  // This can also get dicy as technically there are edge cases where you can be "double-proficient" in a skill. 
+  // This can also get dicy as technically there are edge cases where you can be "double-proficient" in a skill.
   name: Skill;
   bonus: number; //bounded [(-20), 20]ish
-}
+};
 
 type CreatureSense = {
   senseType: Sense;
   senseDistance: number; //value in feet. Always multiples of 5.
-}
+};
 
 type CreatureAbility = {
   // Note: these can get complicated, best to the typing vague
   name: string;
   description: string;
-}
+};
 
 type CreatureAction = {
   name: boolean;
@@ -175,18 +175,18 @@ type CreatureAction = {
   damageDiceNumberToRoll: number;
   damageDiceType: Dice;
   damageType: DamageTypes;
-}
+};
 
 type CreatureSpellSlots = {
   numberOfCastsPerDay: number;
   spellLevel: number; //bounded [0-9]
-}
+};
 
 type LegendaryAction = {
   // special class of action that boss monsters can take at the end of a creature's turn
   description: string; //usually refers to another action the monster has or lets them cast a spell or move a distance or something.
   cost: number; //creatures have fixed number of these around. Some cost multiple legendary actions to perform.
-}
+};
 
 export interface Creature {
   name: string;
@@ -206,7 +206,7 @@ export interface Creature {
   abilities: [CreatureAbility];
   spellslots: [CreatureSpellSlots];
   spellsknown: [string]; //I am not making an enumeration of all the spells
-  reactions: [CreatureAbility]
+  reactions: [CreatureAbility];
   actions: [CreatureAction];
   legendaryactions: [LegendaryAction];
   // there's also such a thing as lair actions but those also start incorporating the environment so are complicated

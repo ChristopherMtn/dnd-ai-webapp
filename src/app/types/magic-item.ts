@@ -13,8 +13,8 @@ export const RarityToFront: Record<Rarity, string> = {
   [Rarity.Rare]: "Rare",
   [Rarity.Very_Rare]: "Very Rare",
   [Rarity.Legendary]: "Legendary",
-  [Rarity.Artifact]: "Artifact"
-}
+  [Rarity.Artifact]: "Artifact",
+};
 
 export const RarityToBack: Record<Rarity, string> = {
   [Rarity.Common]: "common",
@@ -22,8 +22,8 @@ export const RarityToBack: Record<Rarity, string> = {
   [Rarity.Rare]: "rare",
   [Rarity.Very_Rare]: "very Rare",
   [Rarity.Legendary]: "legendary",
-  [Rarity.Artifact]: "artifact"
-}
+  [Rarity.Artifact]: "artifact",
+};
 
 export enum ItemType {
   Weapon,
@@ -39,7 +39,7 @@ export const ItemTypeToFront: Record<ItemType, string> = {
   [ItemType.Armour]: "Armour",
   [ItemType.Shield]: "Shield",
   [ItemType.Spellcasting_Focus]: "Spellcasting Focus",
-}
+};
 
 export const ItemTypeToBack: Record<ItemType, string> = {
   [ItemType.Weapon]: "weapon",
@@ -47,14 +47,14 @@ export const ItemTypeToBack: Record<ItemType, string> = {
   [ItemType.Armour]: "armour",
   [ItemType.Shield]: "shield",
   [ItemType.Spellcasting_Focus]: "spellcasting focus",
-}
+};
 
 export enum ItemPurpose {
   Offense,
   Defense,
   Utility,
   Healing,
-  Support
+  Support,
 }
 
 export const ItemPurposeToFront: Record<ItemPurpose, string> = {
@@ -63,7 +63,7 @@ export const ItemPurposeToFront: Record<ItemPurpose, string> = {
   [ItemPurpose.Utility]: "Utility",
   [ItemPurpose.Healing]: "Healing",
   [ItemPurpose.Support]: "Support",
-}
+};
 
 export const ItemPurposeToBack: Record<ItemPurpose, string> = {
   [ItemPurpose.Offense]: "offense",
@@ -71,15 +71,15 @@ export const ItemPurposeToBack: Record<ItemPurpose, string> = {
   [ItemPurpose.Utility]: "utility",
   [ItemPurpose.Healing]: "healing",
   [ItemPurpose.Support]: "support",
-}
+};
 
 export const Weirdness: Record<number, string> = {
   1: "very straightforward",
   2: "somewhat straightforward",
   3: "slightly unconventional",
   4: "unconventional",
-  5: "very unconventional"
-}
+  5: "very unconventional",
+};
 
 export interface MagicItemInput {
   rarity: Rarity;
