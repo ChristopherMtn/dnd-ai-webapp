@@ -4,9 +4,11 @@ import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 export async function generateText(
   systemPrompt: string,
   userPrompt: string,
-  model: string = "gpt-4o-mini",
+  model: string = (process.env.TEXT_GENERATION_MODEL as string) ||
+    "gpt-4o-mini",
   temperature: number = 1.0
 ): Promise<string> {
+  console.log(`model: ${model}`);
   const messages: ChatCompletionMessageParam[] = [
     { role: "system", content: systemPrompt },
     { role: "user", content: userPrompt },
