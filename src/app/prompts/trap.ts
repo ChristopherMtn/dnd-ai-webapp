@@ -33,6 +33,15 @@ export const trapPromptTemplate = {
     "Example output: {json_format}",
   ],
   json_format,
+  less_dangerous_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the description, trigger, countermeasures, and effects of a trap, create a slightly less dangerous verison of the same trap. Return a JSON object without adding Markdown formatting (such as backticks or \`\`\`json). Only provide valid raw JSON code.`,
+  more_dangerous_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the description, trigger, countermeasures, and effects of a trap, create a slightly more dangerous verison of the same trap. Return a JSON object without adding Markdown formatting (such as backticks or \`\`\`json). Only provide valid raw JSON code.`,
+  danger_prompt_template: [
+    "Description: {description}",
+    "Trigger: {trigger}",
+    "Countermeasures: {countermeasures}",
+    "Effect: {effect}",
+    "Example Output: {json_format}",
+  ],
 };
 
 export const imagePromptTemplate =
@@ -63,6 +72,48 @@ export function generateTrapTextPrompts(
   // Use the formatPrompt function to replace placeholders
   const userPrompt = formatPrompt(trapPromptTemplate.prompt_template, data);
   const systemPrompt = trapPromptTemplate.system_prompt;
+  return { systemPrompt, userPrompt };
+}
+
+export function generateTrapLessDangerousTextPrompts(
+  trapLessInput: TrapOutput
+): TextPromptOutput {
+  const { description, trigger, countermeasures, effect } = trapLessInput;
+
+  const data: Record<string, string> = {
+    description: description,
+    trigger: trigger,
+    countermeasures: countermeasures,
+    effect: effect,
+    json_format: trapPromptTemplate.json_format,
+  };
+
+  const userPrompt = formatPrompt(
+    trapPromptTemplate.danger_prompt_template,
+    data
+  );
+  const systemPrompt = trapPromptTemplate.less_dangerous_system_prompt;
+  return { systemPrompt, userPrompt };
+}
+
+export function generateTrapMoreDangerousTextPrompts(
+  trapMoreInput: TrapOutput
+): TextPromptOutput {
+  const { description, trigger, countermeasures, effect } = trapMoreInput;
+
+  const data: Record<string, string> = {
+    description: description,
+    trigger: trigger,
+    countermeasures: countermeasures,
+    effect: effect,
+    json_format: trapPromptTemplate.json_format,
+  };
+
+  const userPrompt = formatPrompt(
+    trapPromptTemplate.danger_prompt_template,
+    data
+  );
+  const systemPrompt = trapPromptTemplate.more_dangerous_system_prompt;
   return { systemPrompt, userPrompt };
 }
 

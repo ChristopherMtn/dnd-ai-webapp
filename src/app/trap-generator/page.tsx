@@ -56,7 +56,6 @@ export default function TrapGenerator() {
       textData = (await textResponse.json()) as GenerateTrapTextResponse;
 
       if (textResponse.ok) {
-        console.log("output:", textData.trapOutput);
         setTrapDisplay(textData.trapOutput);
       } else {
         console.error("Error from text API:", textData.error);
@@ -138,6 +137,88 @@ export default function TrapGenerator() {
 
   const handleExtraInfoChange = (newInfo: string) => {
     updateTrapInput("additionalDetail", newInfo);
+  };
+
+  const handleLessDangerous = async () => {
+    // make API call with current information to update it
+    if (!trapDisplay) {
+      console.log(
+        "[WARNING] handleLessDangerous triggered but trap display object is not set"
+      );
+      return;
+    }
+    setLoadingDescription(true);
+    setError("");
+    let textData: GenerateTrapTextResponse;
+    try {
+      // Send the trapInput directly to the API
+      const textResponse = await fetch("/api/generate-less-trap", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...trapDisplay }),
+      });
+
+      textData = (await textResponse.json()) as GenerateTrapTextResponse;
+
+      if (textResponse.ok) {
+        setTrapDisplay(textData.trapOutput);
+      } else {
+        console.error("Error from text API:", textData.error);
+        setError(textData.error || "An error occurred during text generation.");
+        setLoadingDescription(false);
+        return;
+      }
+    } catch (err) {
+      console.error("Error during content generation:", err);
+      setError("An unexpected error occurred.");
+      setLoadingDescription(false);
+      return;
+    } finally {
+      setLoadingDescription(false);
+    }
+  };
+
+  const handleMoreDangerous = async () => {
+    // make API call with current information to update it
+    if (!trapDisplay) {
+      console.log(
+        "[WARNING] handleMoreDangerous triggered but trap display object is not set"
+      );
+      return;
+    }
+    setLoadingDescription(true);
+    setError("");
+    let textData: GenerateTrapTextResponse;
+    try {
+      // Send the trapInput directly to the API
+      const textResponse = await fetch("/api/generate-more-trap", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...trapDisplay }),
+      });
+
+      textData = (await textResponse.json()) as GenerateTrapTextResponse;
+
+      if (textResponse.ok) {
+        setTrapDisplay(textData.trapOutput);
+      } else {
+        console.error("Error from text API:", textData.error);
+        setError(textData.error || "An error occurred during text generation.");
+        setLoadingDescription(false);
+        return;
+      }
+    } catch (err) {
+      console.error("Error during content generation:", err);
+      setError("An unexpected error occurred.");
+      setLoadingDescription(false);
+      return;
+    } finally {
+      setLoadingDescription(false);
+    }
   };
 
   return (
@@ -231,8 +312,22 @@ export default function TrapGenerator() {
             <strong>Effect:</strong> {trapDisplay.effect}
           </p>
           <div className="modify-buttons">
-            <button id="less-button">&#x2212; Less Dangerous</button>
-            <button id="more-button">More Dangerous &#x2b;</button>
+            <button
+              id="less-button"
+              type="button"
+              onClick={handleLessDangerous}
+              disabled={loadingDescription}
+            >
+              &#x2212; Less Dangerous
+            </button>
+            <button
+              id="more-button"
+              type="button"
+              onClick={handleMoreDangerous}
+              disabled={loadingDescription}
+            >
+              More Dangerous &#x2b;
+            </button>
           </div>
         </div>
       )}
