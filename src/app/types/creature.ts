@@ -188,6 +188,7 @@ type LegendaryAction = {
   cost: number; //creatures have fixed number of these around. Some cost multiple legendary actions to perform.
 };
 
+// TODO distinguish between creature input and creature output
 export interface Creature {
   name: string;
   description: string;
