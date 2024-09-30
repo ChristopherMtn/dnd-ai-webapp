@@ -6,6 +6,7 @@ import { GenerateTrapTextResponse, GenerateTrapImageResponse } from "../types";
 import { DangerLevel, TrapInput, TrapOutput } from "../types";
 import { trapImageDims } from "../prompts/trap";
 import "../styles/form.css";
+import "../styles/img.css";
 
 export default function TrapGenerator() {
   const [trapDisplay, setTrapDisplay] = useState<TrapOutput>({
@@ -233,33 +234,15 @@ export default function TrapGenerator() {
       )}
 
       {loadingImage && (
-        <div>
+        <div className="img-loading">
           <p>Generating images...</p>
-          <div
-            style={{
-              border: "4px solid rgba(0, 0, 0, 0.1)",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              borderLeftColor: "#09f",
-              animation: "spin 1s linear infinite",
-              margin: "20px auto",
-            }}
-          ></div>
         </div>
       )}
 
       {imageUrls.length > 0 && (
         <div>
           <h2>Images:</h2>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "10px",
-              flexWrap: "wrap", // Allow wrapping if there are too many images
-            }}
-          >
+          <div className="img-display">
             {imageUrls.map((url, index) => (
               <Image
                 key={index}
@@ -267,7 +250,7 @@ export default function TrapGenerator() {
                 alt={`Generated DND-style Trap ${index + 1}`}
                 width={trapImageDims.width}
                 height={trapImageDims.height}
-                style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+                className="img"
               />
             ))}
           </div>

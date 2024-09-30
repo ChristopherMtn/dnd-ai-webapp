@@ -13,6 +13,7 @@ import {
   MagicItemOutput,
 } from "../types/magic-item";
 import "../styles/form.css";
+import "../styles/img.css";
 import { magicItemImageDims } from "../prompts/magic-item";
 
 export default function MagicItemGenerator() {
@@ -347,33 +348,15 @@ export default function MagicItemGenerator() {
       )}
 
       {loadingImage && (
-        <div>
+        <div className="img-loading">
           <p>Generating images...</p>
-          <div
-            style={{
-              border: "4px solid rgba(0, 0, 0, 0.1)",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              borderLeftColor: "#09f",
-              animation: "spin 1s linear infinite",
-              margin: "20px auto",
-            }}
-          ></div>
         </div>
       )}
 
       {imageUrls.length > 0 && (
         <div>
           <h2>Images:</h2>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "10px",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className="img-display">
             {imageUrls.map((url, index) => (
               <Image
                 key={index}
@@ -381,7 +364,7 @@ export default function MagicItemGenerator() {
                 alt={`Generated DND-style Magic Item ${index + 1}`}
                 width={magicItemImageDims.width}
                 height={magicItemImageDims.height}
-                style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+                className="img"
               />
             ))}
           </div>
