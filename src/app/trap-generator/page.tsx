@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { GenerateTrapTextResponse, GenerateTrapImageResponse } from "../types";
 import { DangerLevel, TrapInput, TrapOutput } from "../types";
-import { trapImageDims } from "../prompt_templates/trap";
+import { trapImageDims } from "../prompts/trap";
 import "../styles/form.css";
 
 export default function TrapGenerator() {

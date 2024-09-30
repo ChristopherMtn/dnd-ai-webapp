@@ -4,18 +4,23 @@ import { useState } from "react";
 import Image from "next/image";
 import {
   Rarity,
-  PresetItemType,
+  RarityToFront,
+  ItemType,
+  ItemTypeToFront,
+  ItemPurpose,
+  ItemPurposeToFront,
   MagicItemInput,
   MagicItemOutput,
 } from "../types/magic-item";
 import "../styles/form.css";
+import { magicItemImageDims } from "../prompts/magic-item";
 
 export default function MagicItemGenerator() {
   const [magicItemDisplay, setMagicItemDisplay] = useState<MagicItemOutput>({
-    rarity: Rarity.Common,
+    rarity: "",
     description: "",
     itemType: "",
-    stats: JSON.parse("{}"),
+    itemPurpose: "",
     abilitiesAndEffects: "",
   });
 
@@ -26,14 +31,13 @@ export default function MagicItemGenerator() {
   const [magicItemInput, setMagicItemInput] = useState<MagicItemInput>({
     rarity: Rarity.Common,
     uses: "",
-    itemTypePreset: PresetItemType.Weapon,
-    itemTypeFreeText: "",
+    itemType: "",
+    itemPurpose: "",
+    cursed: false,
     curses: "",
-    magicSpecification: "",
-    statistics: JSON.parse("{}"),
     attunement: false,
-    magicCreativity: 50,
-    curseCreativity: 50,
+    magicCreativity: 3,
+    curseCreativity: 3,
     additionalDetail: "",
   });
 
@@ -42,10 +46,10 @@ export default function MagicItemGenerator() {
     setLoadingDescription(true);
     setError("");
     setMagicItemDisplay({
-      rarity: Rarity.Common,
+      rarity: "",
       description: "",
       itemType: "",
-      stats: JSON.parse("{}"),
+      itemPurpose: "",
       abilitiesAndEffects: "",
     });
     setImageUrls([]);
@@ -54,7 +58,6 @@ export default function MagicItemGenerator() {
     let textData: { magicItemOutput: MagicItemOutput; error?: string };
 
     try {
-      // Send the magicItemInput directly to the API
       const textResponse = await fetch("/api/generate-magic-item-text", {
         method: "POST",
         headers: {
@@ -66,10 +69,8 @@ export default function MagicItemGenerator() {
       textData = await textResponse.json();
 
       if (textResponse.ok) {
-        console.log("output:", textData.magicItemOutput);
         setMagicItemDisplay(textData.magicItemOutput);
       } else {
-        console.error("Error from text API:", textData.error);
         setError(textData.error || "An error occurred during text generation.");
         setLoadingDescription(false);
         return;
@@ -83,11 +84,10 @@ export default function MagicItemGenerator() {
       setLoadingDescription(false);
     }
 
-    // After description is set, start generating the images
+    // Start generating images
     setLoadingImage(true);
     try {
       const imageDescription = textData.magicItemOutput.description;
-      // Generate Images using the Description
       const imageResponse = await fetch("/api/generate-magic-item-image", {
         method: "POST",
         headers: {
@@ -100,7 +100,6 @@ export default function MagicItemGenerator() {
       if (imageResponse.ok) {
         setImageUrls(imageData.imageUrls);
       } else {
-        console.error("Error from image API:", imageData.error);
         setError(
           imageData.error || "An error occurred during image generation."
         );
@@ -128,9 +127,10 @@ export default function MagicItemGenerator() {
     }));
   };
 
-  const handleRarityChange = (newRarity: string) => {
-    if (newRarity in Rarity) {
-      updateMagicItemInput("rarity", newRarity as Rarity);
+  const handleRarityChange = (newRarityValue: string) => {
+    const rarityValue = parseInt(newRarityValue, 10);
+    if (!isNaN(rarityValue)) {
+      updateMagicItemInput("rarity", rarityValue as Rarity);
     }
   };
 
@@ -138,32 +138,19 @@ export default function MagicItemGenerator() {
     updateMagicItemInput("uses", newUses);
   };
 
-  const handleItemTypePresetChange = (newType: string) => {
-    if (newType in PresetItemType) {
-      updateMagicItemInput("itemTypePreset", newType as PresetItemType);
-    }
+  const handleEnumOrStringChange = (
+    key: "itemType" | "itemPurpose",
+    value: string
+  ) => {
+    updateMagicItemInput(key, value);
   };
 
-  const handleItemTypeFreeTextChange = (newType: string) => {
-    updateMagicItemInput("itemTypeFreeText", newType);
+  const handleCursedChange = (newValue: boolean) => {
+    updateMagicItemInput("cursed", newValue);
   };
 
   const handleCursesChange = (newCurses: string) => {
     updateMagicItemInput("curses", newCurses);
-  };
-
-  const handleMagicSpecificationChange = (newSpec: string) => {
-    updateMagicItemInput("magicSpecification", newSpec);
-  };
-
-  const handleStatisticsChange = (newStats: string) => {
-    try {
-      const statsJson = JSON.parse(newStats);
-      updateMagicItemInput("statistics", statsJson);
-    } catch (error) {
-      console.error("Invalid JSON for statistics");
-      setError("Invalid JSON format for statistics.");
-    }
   };
 
   const handleAttunementChange = (newValue: boolean) => {
@@ -193,11 +180,11 @@ export default function MagicItemGenerator() {
             onChange={(e) => handleRarityChange(e.target.value)}
             disabled={loadingDescription}
           >
-            {Object.keys(Rarity)
-              .filter((key) => isNaN(Number(key)))
-              .map((key) => (
-                <option key={key} value={key}>
-                  {key.replace("_", " ")}
+            {Object.values(Rarity)
+              .filter((value) => typeof value === "number")
+              .map((value) => (
+                <option key={value} value={value}>
+                  {RarityToFront[value as Rarity]}
                 </option>
               ))}
           </select>
@@ -214,63 +201,87 @@ export default function MagicItemGenerator() {
         </label>
 
         <label>
-          Item Type (Preset):
-          <select
-            value={magicItemInput.itemTypePreset}
-            onChange={(e) => handleItemTypePresetChange(e.target.value)}
+          Item Type:
+          <input
+            type="text"
+            list="itemTypeOptions"
+            value={magicItemInput.itemType}
+            onChange={(e) =>
+              handleEnumOrStringChange("itemType", e.target.value)
+            }
             disabled={loadingDescription}
-          >
-            {Object.keys(PresetItemType)
-              .filter((key) => isNaN(Number(key)))
-              .map((key) => (
-                <option key={key} value={key}>
-                  {key.replace("_", " ")}
-                </option>
+          />
+          <datalist id="itemTypeOptions">
+            {Object.values(ItemType)
+              .filter((value) => typeof value === "number")
+              .map((value) => (
+                <option
+                  key={value}
+                  value={ItemTypeToFront[value as ItemType]}
+                />
               ))}
-          </select>
+          </datalist>
         </label>
 
         <label>
-          Item Type (Free Text):
+          Item Purpose:
           <input
             type="text"
-            value={magicItemInput.itemTypeFreeText}
-            onChange={(e) => handleItemTypeFreeTextChange(e.target.value)}
+            list="itemPurposeOptions"
+            value={magicItemInput.itemPurpose}
+            onChange={(e) =>
+              handleEnumOrStringChange("itemPurpose", e.target.value)
+            }
             disabled={loadingDescription}
           />
+          <datalist id="itemPurposeOptions">
+            {Object.values(ItemPurpose)
+              .filter((value) => typeof value === "number")
+              .map((value) => (
+                <option
+                  key={value}
+                  value={ItemPurposeToFront[value as ItemPurpose]}
+                />
+              ))}
+          </datalist>
         </label>
 
         <label>
-          Curses:
+          Cursed:
           <input
-            type="text"
-            value={magicItemInput.curses}
-            onChange={(e) => handleCursesChange(e.target.value)}
+            type="checkbox"
+            checked={magicItemInput.cursed}
+            onChange={(e) => handleCursedChange(e.target.checked)}
             disabled={loadingDescription}
           />
         </label>
 
-        <label>
-          Magic Specification:
-          <textarea
-            value={magicItemInput.magicSpecification}
-            onChange={(e) => handleMagicSpecificationChange(e.target.value)}
-            placeholder="Enter magic specifications"
-            rows={3}
-            disabled={loadingDescription}
-          />
-        </label>
-
-        <label>
-          Statistics (JSON format):
-          <textarea
-            value={JSON.stringify(magicItemInput.statistics)}
-            onChange={(e) => handleStatisticsChange(e.target.value)}
-            placeholder='Enter statistics in JSON format (e.g., {"damage": "1d6", "weight": 2})'
-            rows={3}
-            disabled={loadingDescription}
-          />
-        </label>
+        {magicItemInput.cursed && (
+          <>
+            <label>
+              Curse Creativity (1-5):
+              <input
+                type="number"
+                value={magicItemInput.curseCreativity}
+                onChange={(e) =>
+                  handleCurseCreativityChange(e.target.valueAsNumber)
+                }
+                disabled={loadingDescription}
+                min={1}
+                max={5}
+              />
+            </label>
+            <label>
+              Curse:
+              <input
+                type="text"
+                value={magicItemInput.curses}
+                onChange={(e) => handleCursesChange(e.target.value)}
+                disabled={loadingDescription}
+              />
+            </label>
+          </>
+        )}
 
         <label>
           Attunement Required:
@@ -283,7 +294,7 @@ export default function MagicItemGenerator() {
         </label>
 
         <label>
-          Magic Creativity (0-100):
+          Magic Creativity (1-5):
           <input
             type="number"
             value={magicItemInput.magicCreativity}
@@ -291,22 +302,8 @@ export default function MagicItemGenerator() {
               handleMagicCreativityChange(e.target.valueAsNumber)
             }
             disabled={loadingDescription}
-            min={0}
-            max={100}
-          />
-        </label>
-
-        <label>
-          Curse Creativity (0-100):
-          <input
-            type="number"
-            value={magicItemInput.curseCreativity}
-            onChange={(e) =>
-              handleCurseCreativityChange(e.target.valueAsNumber)
-            }
-            disabled={loadingDescription}
-            min={0}
-            max={100}
+            min={1}
+            max={5}
           />
         </label>
 
@@ -346,10 +343,6 @@ export default function MagicItemGenerator() {
             <strong>Abilities and Effects:</strong>{" "}
             {magicItemDisplay.abilitiesAndEffects}
           </p>
-          <p>
-            <strong>Statistics:</strong>{" "}
-            {JSON.stringify(magicItemDisplay.stats)}
-          </p>
         </div>
       )}
 
@@ -386,8 +379,8 @@ export default function MagicItemGenerator() {
                 key={index}
                 src={url}
                 alt={`Generated DND-style Magic Item ${index + 1}`}
-                width={256}
-                height={256}
+                width={magicItemImageDims.width}
+                height={magicItemImageDims.height}
                 style={{ border: "1px solid #ccc", borderRadius: "4px" }}
               />
             ))}

@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GenerateTrapImageRequest } from "@/app/types";
-import { generateTrapImagePrompt, trapImageDims } from "@/app/prompts/trap";
+import { GenerateMagicItemImageRequest } from "@/app/types";
 import { generateImage } from "@/app/utils/imageGenerator";
 import { handleApiError } from "@/app/utils/errorHandler";
+import {
+  generateMagicItemImagePrompt,
+  magicItemImageDims,
+} from "@/app/prompts/magic-item";
 
 export async function POST(request: NextRequest) {
   try {
     const { imageDescription } =
-      (await request.json()) as GenerateTrapImageRequest;
+      (await request.json()) as GenerateMagicItemImageRequest;
 
     if (!imageDescription) {
       return NextResponse.json(
@@ -16,8 +19,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = generateTrapImagePrompt(imageDescription);
-    const size = `${trapImageDims.width}x${trapImageDims.height}`;
+    const prompt = generateMagicItemImagePrompt(imageDescription);
+    const size = `${magicItemImageDims.width}x${magicItemImageDims.height}`;
 
     const imageUrls = await generateImage(prompt, size);
 

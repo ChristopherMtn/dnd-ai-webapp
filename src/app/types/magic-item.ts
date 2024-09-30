@@ -84,10 +84,8 @@ export const Weirdness: Record<number, string> = {
 export interface MagicItemInput {
   rarity: Rarity;
   uses: string;
-  itemTypePreset: ItemType;
-  itemTypeFreeText: string;
-  itemPurposePreset: ItemPurpose;
-  itemPurposeFreeText: string;
+  itemType: ItemType | string;
+  itemPurpose: ItemPurpose | string;
   cursed: boolean;
   curses: string;
   attunement: boolean;
@@ -97,9 +95,9 @@ export interface MagicItemInput {
 }
 
 export interface MagicItemOutput {
-  rarity: Rarity;
+  rarity: string;
   description: string;
-  itemType: string | ItemType;
-  itemPurpose: string | ItemPurpose;
+  itemType: string;
+  itemPurpose: string;
   abilitiesAndEffects: string;
 }

@@ -1,11 +1,12 @@
-import { TrapOutput } from "../types";
+import { TrapInput, TrapOutput, DangerLevelToBack } from "../types";
+import { formatPrompt, TextPromptOutput } from "../utils/formatPrompt";
 
 export const trapImageDims = {
   width: 1024,
   height: 1024,
 };
 
-function generateJsonFormat<T>(template: { [K in keyof T]: string }): string {
+function generateJsonFormat<T>(template: T): string {
   return JSON.stringify(template, null, 2);
 }
 
@@ -33,3 +34,38 @@ export const trapPromptTemplate = {
   ],
   json_format,
 };
+
+export const imagePromptTemplate =
+  "In a Dungeons and Dragons art style: {imageDescription}";
+
+export function generateTrapTextPrompts(
+  trapInput: TrapInput
+): TextPromptOutput {
+  const { magic, dangerLevel, environment, CharacterLevel, additionalDetail } =
+    trapInput;
+
+  // Convert the 'magic' boolean to 'magical' or 'non-magical'
+  const magicString = magic ? "magical" : "non-magical";
+
+  // Convert 'dangerLevel' enum to string using the mapping
+  const dangerString = DangerLevelToBack[dangerLevel];
+
+  // Prepare the data object for placeholder replacement
+  const data: Record<string, string> = {
+    magic: magicString,
+    danger: dangerString,
+    environment: environment || "any",
+    CharacterLevel: CharacterLevel.toString(),
+    additionalDetail: additionalDetail || "None",
+    json_format: trapPromptTemplate.json_format,
+  };
+
+  // Use the formatPrompt function to replace placeholders
+  const userPrompt = formatPrompt(trapPromptTemplate.prompt_template, data);
+  const systemPrompt = trapPromptTemplate.system_prompt;
+  return { systemPrompt, userPrompt };
+}
+
+export function generateTrapImagePrompt(imageDescription: string): string {
+  return formatPrompt([imagePromptTemplate], { imageDescription });
+}
