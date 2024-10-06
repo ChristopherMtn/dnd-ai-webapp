@@ -95,6 +95,7 @@ export interface MagicItemInput {
 }
 
 export interface MagicItemOutput {
+  name: string;
   rarity: string;
   description: string;
   itemType: string;

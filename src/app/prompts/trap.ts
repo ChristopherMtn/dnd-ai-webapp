@@ -11,6 +11,7 @@ function generateJsonFormat<T>(template: T): string {
 }
 
 const trapOutputExample: TrapOutput = {
+  name: "Barrier of Light",
   description:
     "A shimmering magical barrier blocks a narrow stone hallway. The barrier glows faintly with runes that pulse in rhythmic patterns, enticing the party to approach.",
   trigger:
@@ -36,6 +37,7 @@ export const trapPromptTemplate = {
   less_dangerous_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the description, trigger, countermeasures, and effects of a trap, create a slightly less dangerous verison of the same trap. Return a JSON object without adding Markdown formatting (such as backticks or \`\`\`json). Only provide valid raw JSON code.`,
   more_dangerous_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the description, trigger, countermeasures, and effects of a trap, create a slightly more dangerous verison of the same trap. Return a JSON object without adding Markdown formatting (such as backticks or \`\`\`json). Only provide valid raw JSON code.`,
   danger_prompt_template: [
+    "Name: {name}",
     "Description: {description}",
     "Trigger: {trigger}",
     "Countermeasures: {countermeasures}",

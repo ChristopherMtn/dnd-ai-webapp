@@ -1,10 +1,9 @@
-/* styles/form.css */
-
 /* Style for the form container */
 .form {
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f8f9fa;
 }
 
 /* Style for form headings */
@@ -18,7 +17,7 @@
 .form label {
   display: block;
   margin-bottom: 15px;
-  color: #ffffff;
+  color: #000000;
   font-size: 16px;
 }
 
@@ -78,6 +77,12 @@
   margin-bottom: 15px;
 }
 
+/* Loading Image Block */
+.phb-loading-block {
+  text-align: center;
+  font-style: italic;
+}
+
 .modify-buttons {
   display: flex;
   justify-content: center;
@@ -89,4 +94,31 @@
 #more-button {
   padding: 10px;
   border-radius: 5px;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.modify-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Hide elements during print that are not part of the display */
+@media print {
+  body {
+    visibility: hidden;
+  }
+  #section-to-print {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
 }

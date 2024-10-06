@@ -25,6 +25,7 @@ export interface TrapInput {
 }
 
 export interface TrapOutput {
+  name: string;
   description: string;
   trigger: string;
   countermeasures: string;

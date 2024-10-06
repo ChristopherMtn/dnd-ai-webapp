@@ -5,11 +5,14 @@ import Image from "next/image";
 import { GenerateTrapTextResponse, GenerateTrapImageResponse } from "../types";
 import { DangerLevel, TrapInput, TrapOutput } from "../types";
 import { trapImageDims } from "../prompts/trap";
+import { handlePrint } from "../utils/printHandler";
 import "../styles/form.css";
 import "../styles/img.css";
+import "../styles/phb.standalone.css";
 
 export default function TrapGenerator() {
   const [trapDisplay, setTrapDisplay] = useState<TrapOutput>({
+    name: "",
     description: "",
     trigger: "",
     countermeasures: "",
@@ -33,6 +36,7 @@ export default function TrapGenerator() {
     setLoadingDescription(true);
     setError("");
     setTrapDisplay({
+      name: "",
       description: "",
       trigger: "",
       countermeasures: "",
@@ -297,63 +301,84 @@ export default function TrapGenerator() {
       {error && <p className="error">{error}</p>}
 
       {trapDisplay.description && (
-        <div>
-          <h2>Trap Details:</h2>
-          <p>
-            <strong>Description:</strong> {trapDisplay.description}
-          </p>
-          <p>
-            <strong>Trigger:</strong> {trapDisplay.trigger}
-          </p>
-          <p>
-            <strong>Countermeasures:</strong> {trapDisplay.countermeasures}
-          </p>
-          <p>
-            <strong>Effect:</strong> {trapDisplay.effect}
-          </p>
-          <div className="modify-buttons">
+        <>
+          {/* Trap Display Section */}
+          <div id="section-to-print" className="phb">
+            <h2>{trapDisplay.name}</h2>
+            <div className="phb-columns">
+              {/* Left Column */}
+              <div className="left-column">
+                <div>
+                  <h3>Description</h3>
+                  <p>{trapDisplay.description}</p>
+                </div>
+                <div>
+                  <h3>Trigger</h3>
+                  <p>{trapDisplay.trigger}</p>
+                </div>
+                <div>
+                  <h3>Countermeasures</h3>
+                  <p>{trapDisplay.countermeasures}</p>
+                </div>
+                <div>
+                  <h3>Effect</h3>
+                  <p>{trapDisplay.effect}</p>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="right-column">
+                {imageUrls.length > 0 ? (
+                  <div>
+                    <Image
+                      src={imageUrls[0]}
+                      alt="Generated DND-style Trap"
+                      width={trapImageDims.width}
+                      height={trapImageDims.height}
+                    />
+                  </div>
+                ) : (
+                  loadingImage && (
+                    <div className="phb-loading-block">
+                      <p>Generating image...</p>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Buttons Section */}
+          <div className="button-group">
+            <div className="modify-buttons">
+              <button
+                id="less-button"
+                type="button"
+                onClick={handleLessDangerous}
+                disabled={loadingDescription}
+                className="phb-button"
+              >
+                &#x2212; Less Dangerous
+              </button>
+              <button
+                id="more-button"
+                type="button"
+                onClick={handleMoreDangerous}
+                disabled={loadingDescription}
+                className="phb-button"
+              >
+                More Dangerous &#x2b;
+              </button>
+            </div>
             <button
-              id="less-button"
               type="button"
-              onClick={handleLessDangerous}
-              disabled={loadingDescription}
+              onClick={handlePrint}
+              className="phb-button print-button"
             >
-              &#x2212; Less Dangerous
-            </button>
-            <button
-              id="more-button"
-              type="button"
-              onClick={handleMoreDangerous}
-              disabled={loadingDescription}
-            >
-              More Dangerous &#x2b;
+              Download as PDF
             </button>
           </div>
-        </div>
-      )}
-
-      {loadingImage && (
-        <div className="img-loading">
-          <p>Generating images...</p>
-        </div>
-      )}
-
-      {imageUrls.length > 0 && (
-        <div>
-          <h2>Images:</h2>
-          <div className="img-display">
-            {imageUrls.map((url, index) => (
-              <Image
-                key={index}
-                src={url}
-                alt={`Generated DND-style Trap ${index + 1}`}
-                width={trapImageDims.width}
-                height={trapImageDims.height}
-                className="img"
-              />
-            ))}
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

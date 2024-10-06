@@ -15,9 +15,11 @@ import {
 import "../styles/form.css";
 import "../styles/img.css";
 import { magicItemImageDims } from "../prompts/magic-item";
+import { handlePrint } from "../utils/printHandler";
 
 export default function MagicItemGenerator() {
   const [magicItemDisplay, setMagicItemDisplay] = useState<MagicItemOutput>({
+    name: "",
     rarity: "",
     description: "",
     itemType: "",
@@ -47,6 +49,7 @@ export default function MagicItemGenerator() {
     setLoadingDescription(true);
     setError("");
     setMagicItemDisplay({
+      name: "",
       rarity: "",
       description: "",
       itemType: "",
@@ -409,64 +412,91 @@ export default function MagicItemGenerator() {
       {error && <p className="error">{error}</p>}
 
       {magicItemDisplay.description && (
-        <div>
-          <h2>Magic Item Details:</h2>
-          <p>
-            <strong>Rarity:</strong> {magicItemDisplay.rarity}
-          </p>
-          <p>
-            <strong>Item Type:</strong> {magicItemDisplay.itemType}
-          </p>
-          <p>
-            <strong>Description:</strong> {magicItemDisplay.description}
-          </p>
-          <p>
-            <strong>Abilities and Effects:</strong>{" "}
-            {magicItemDisplay.abilitiesAndEffects}
-          </p>
-          <div className="modify-buttons">
+        <>
+          {/* Magic Item Display Section */}
+          <div id="section-to-print" className="phb">
+            <h2>{magicItemDisplay.name}</h2>
+            <div className="phb-columns">
+              {/* Left Column */}
+              <div className="left-column">
+                <div>
+                  <h3>Rarity</h3>
+                  <p>{magicItemDisplay.rarity}</p>
+                </div>
+                <div>
+                  <h3>Item Type</h3>
+                  <p>{magicItemDisplay.itemType}</p>
+                </div>
+                <div>
+                  <h3>Description</h3>
+                  <p>{magicItemDisplay.description}</p>
+                </div>
+                <div>
+                  <h3>Abilities and Effects</h3>
+                  <p>{magicItemDisplay.abilitiesAndEffects}</p>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="right-column">
+                {imageUrls.length > 0 ? (
+                  <div>
+                    <h3>Image</h3>
+                    <div className="img-display">
+                      {imageUrls.map((url, index) => (
+                        <Image
+                          key={index}
+                          src={url}
+                          alt={`Generated DND-style Magic Item ${index + 1}`}
+                          width={magicItemImageDims.width}
+                          height={magicItemImageDims.height}
+                          className="img"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  loadingImage && (
+                    <div className="phb-loading-block">
+                      <p>Generating image...</p>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Buttons Section */}
+          <div className="button-group">
+            <div className="modify-buttons">
+              <button
+                id="less-button"
+                type="button"
+                onClick={handleLessPowerful}
+                disabled={loadingDescription}
+                className="phb-button"
+              >
+                &#x2212; Less Powerful
+              </button>
+              <button
+                id="more-button"
+                type="button"
+                onClick={handleMorePowerful}
+                disabled={loadingDescription}
+                className="phb-button"
+              >
+                More Powerful &#x2b;
+              </button>
+            </div>
             <button
-              id="less-button"
               type="button"
-              onClick={handleLessPowerful}
-              disabled={loadingDescription}
+              onClick={handlePrint}
+              className="phb-button print-button"
             >
-              &#x2212; Less Powerful
-            </button>
-            <button
-              id="more-button"
-              type="button"
-              onClick={handleMorePowerful}
-              disabled={loadingDescription}
-            >
-              More Powerful &#x2b;
+              Download as PDF
             </button>
           </div>
-        </div>
-      )}
-
-      {loadingImage && (
-        <div className="img-loading">
-          <p>Generating images...</p>
-        </div>
-      )}
-
-      {imageUrls.length > 0 && (
-        <div>
-          <h2>Images:</h2>
-          <div className="img-display">
-            {imageUrls.map((url, index) => (
-              <Image
-                key={index}
-                src={url}
-                alt={`Generated DND-style Magic Item ${index + 1}`}
-                width={magicItemImageDims.width}
-                height={magicItemImageDims.height}
-                className="img"
-              />
-            ))}
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

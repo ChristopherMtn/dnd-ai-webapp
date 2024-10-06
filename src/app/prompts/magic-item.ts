@@ -19,6 +19,7 @@ function generateJsonFormat<T>(template: T): string {
 }
 
 const magicItemOutputExample: MagicItemOutput = {
+  name: "Frostbrand",
   rarity: RarityToFront[Rarity.Rare], // "rare"
   description:
     "A finely crafted longsword with an intricate hilt that glows with a faint blue light.",
@@ -49,6 +50,7 @@ export const magicItemPromptTemplate = {
   less_powerful_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the rarity, description, item type, item purpose, and abilities/effects of a magic item, create a slightly less powerful verison of the same item. Return a JSON object without Markdown formatting. Only provide valid raw JSON code.`,
   more_powerful_system_prompt: `You are an AI specialized in Dungeons and Dragons. Given text providing the rarity, description, item type, item purpose, and abilities/effects of a magic item, create a slightly more powerful verison of the same item. Return a JSON object without Markdown formatting. Only provide valid raw JSON code.`,
   power_prompt_template: [
+    "Name: {name}",
     "Rarity: {rarity}",
     "Description: {description}",
     "Item Type: {itemType}",
@@ -110,14 +112,21 @@ export function generateMagicItemTextPrompts(
 export function generateMagicItemLessPowerfulTextPrompts(
   magicItemLessInput: MagicItemOutput
 ) {
-  const { rarity, description, itemType, itemPurpose, abilitiesAndEffects } =
-    magicItemLessInput;
+  const {
+    name,
+    rarity,
+    description,
+    itemType,
+    itemPurpose,
+    abilitiesAndEffects,
+  } = magicItemLessInput;
   const data: Record<string, string> = {
-    rarity: rarity,
-    description: description,
-    itemType: itemType,
-    itemPurpose: itemPurpose,
-    abilitiesAndEffects: abilitiesAndEffects,
+    name,
+    rarity,
+    description,
+    itemType,
+    itemPurpose,
+    abilitiesAndEffects,
     json_format: magicItemPromptTemplate.json_format,
   };
 
@@ -132,14 +141,21 @@ export function generateMagicItemLessPowerfulTextPrompts(
 export function generateMagicItemMorePowerfulTextPrompts(
   magicItemMoreInput: MagicItemOutput
 ) {
-  const { rarity, description, itemType, itemPurpose, abilitiesAndEffects } =
-    magicItemMoreInput;
+  const {
+    name,
+    rarity,
+    description,
+    itemType,
+    itemPurpose,
+    abilitiesAndEffects,
+  } = magicItemMoreInput;
   const data: Record<string, string> = {
-    rarity: rarity,
-    description: description,
-    itemType: itemType,
-    itemPurpose: itemPurpose,
-    abilitiesAndEffects: abilitiesAndEffects,
+    name,
+    rarity,
+    description,
+    itemType,
+    itemPurpose,
+    abilitiesAndEffects,
     json_format: magicItemPromptTemplate.json_format,
   };
 
