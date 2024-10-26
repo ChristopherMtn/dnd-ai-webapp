@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession, signIn } from "next-auth/react";
 import Image from "next/image";
 import { GenerateTrapTextResponse, GenerateTrapImageResponse } from "../types";
 import { DangerLevel, TrapInput, TrapOutput } from "../types";
@@ -30,6 +31,21 @@ export default function TrapGenerator() {
     additionalDetail: "",
   });
   const { dangerLevel } = trapInput;
+
+  //protect content until login
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "loading") return; // Do nothing while loading
+    if (!session) signIn("google"); // Redirect if not authenticated
+  }, [session, status]);
+
+  if (status === "loading") return <p>Loading...</p>;
+
+  // don't display content if not signed in
+  if (!session) {
+    return;
+  }
 
   const handleGenerateContent = async (e: React.FormEvent) => {
     e.preventDefault();
