@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
+  const { data: session } = useSession(); // Access the session
+
   return (
     <nav style={navStyle}>
       <ul style={ulStyle}>
@@ -14,7 +16,20 @@ export default function Navbar() {
           <Link href="/magic-item-generator">Magic Item Generator</Link>
         </li>
         <li style={{ ...liStyle, marginLeft: "auto" }}>
-          <button onClick={() => signIn("google")}>Sign in with Google</button>
+          {!session ? (
+            <button onClick={() => signIn("google")}>
+              Sign in with Google
+            </button>
+          ) : (
+            <div>
+              <span style={{ color: "white", marginRight: "10px" }}>
+                {session.user?.email}
+              </span>
+              <button onClick={() => signOut()} style={signOutButtonStyle}>
+                Sign Out
+              </button>
+            </div>
+          )}
         </li>
       </ul>
     </nav>
@@ -35,4 +50,13 @@ const ulStyle = {
 
 const liStyle = {
   marginRight: "15px",
+};
+
+const signOutButtonStyle = {
+  backgroundColor: "#dc3545", // Red color for sign out
+  color: "white",
+  border: "none",
+  padding: "5px 10px",
+  borderRadius: "4px",
+  cursor: "pointer",
 };
