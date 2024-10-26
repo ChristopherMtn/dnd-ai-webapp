@@ -10,6 +10,7 @@ import { handlePrint } from "../utils/printHandler";
 import "../styles/form.css";
 import "../styles/img.css";
 import "../styles/phb.standalone.css";
+import { useAPIRequestLimiter } from "../utils/requestLimit";
 
 export default function TrapGenerator() {
   const [trapDisplay, setTrapDisplay] = useState<TrapOutput>({
@@ -23,6 +24,7 @@ export default function TrapGenerator() {
   const [loadingDescription, setLoadingDescription] = useState(false);
   const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState("");
+  const { canMakeRequest, incrementRequestCount } = useAPIRequestLimiter();
   const [trapInput, setTrapInput] = useState<TrapInput>({
     magic: false,
     dangerLevel: DangerLevel.Deterrent,
@@ -77,6 +79,7 @@ export default function TrapGenerator() {
 
       if (textResponse.ok) {
         setTrapDisplay(textData.trapOutput);
+        incrementRequestCount();
       } else {
         console.error("Error from text API:", textData.error);
         setError(textData.error || "An error occurred during text generation.");
@@ -184,6 +187,7 @@ export default function TrapGenerator() {
 
       if (textResponse.ok) {
         setTrapDisplay(textData.trapOutput);
+        incrementRequestCount();
       } else {
         console.error("Error from text API:", textData.error);
         setError(textData.error || "An error occurred during text generation.");
@@ -225,6 +229,7 @@ export default function TrapGenerator() {
 
       if (textResponse.ok) {
         setTrapDisplay(textData.trapOutput);
+        incrementRequestCount();
       } else {
         console.error("Error from text API:", textData.error);
         setError(textData.error || "An error occurred during text generation.");
@@ -307,11 +312,28 @@ export default function TrapGenerator() {
           />
         </label>
 
-        <button type="submit" disabled={loadingDescription}>
-          {loadingDescription
-            ? "Generating Description..."
-            : "Generate Content"}
-        </button>
+        {canMakeRequest() ? (
+          <button type="submit" disabled={loadingDescription}>
+            {loadingDescription
+              ? "Generating Description..."
+              : "Generate Content"}
+          </button>
+        ) : (
+          <div>
+            <button type="submit" disabled={true}>
+              {loadingDescription
+                ? "Generating Description..."
+                : "Generate Content"}
+            </button>
+            <label>
+              You have exceeded the allowed number of generations.
+              <br />
+              Please wait until tomorrow to continue creating.
+              <br />
+              Thank you for using DnD Tools!
+            </label>
+          </div>
+        )}
       </form>
 
       {error && <p className="error">{error}</p>}
@@ -371,7 +393,7 @@ export default function TrapGenerator() {
                 id="less-button"
                 type="button"
                 onClick={handleLessDangerous}
-                disabled={loadingDescription}
+                disabled={loadingDescription || !canMakeRequest()}
                 className="phb-button"
               >
                 &#x2212; Less Dangerous
@@ -380,7 +402,7 @@ export default function TrapGenerator() {
                 id="more-button"
                 type="button"
                 onClick={handleMoreDangerous}
-                disabled={loadingDescription}
+                disabled={loadingDescription || !canMakeRequest()}
                 className="phb-button"
               >
                 More Dangerous &#x2b;

@@ -17,6 +17,7 @@ import "../styles/form.css";
 import "../styles/img.css";
 import { magicItemImageDims } from "../prompts/magic-item";
 import { handlePrint } from "../utils/printHandler";
+import { useAPIRequestLimiter } from "../utils/requestLimit";
 
 export default function MagicItemGenerator() {
   const [magicItemDisplay, setMagicItemDisplay] = useState<MagicItemOutput>({
@@ -32,6 +33,7 @@ export default function MagicItemGenerator() {
   const [loadingDescription, setLoadingDescription] = useState(false);
   const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState("");
+  const { canMakeRequest, incrementRequestCount } = useAPIRequestLimiter();
   const [magicItemInput, setMagicItemInput] = useState<MagicItemInput>({
     rarity: Rarity.Common,
     uses: "",
@@ -90,6 +92,7 @@ export default function MagicItemGenerator() {
 
       if (textResponse.ok) {
         setMagicItemDisplay(textData.magicItemOutput);
+        incrementRequestCount();
       } else {
         setError(textData.error || "An error occurred during text generation.");
         setLoadingDescription(false);
@@ -214,6 +217,7 @@ export default function MagicItemGenerator() {
 
       if (textResponse.ok) {
         setMagicItemDisplay(textData.magicItemOutput);
+        incrementRequestCount();
       } else {
         setError(textData.error || "An error occurred during text generation.");
         setLoadingDescription(false);
@@ -254,6 +258,7 @@ export default function MagicItemGenerator() {
 
       if (textResponse.ok) {
         setMagicItemDisplay(textData.magicItemOutput);
+        incrementRequestCount();
       } else {
         setError(textData.error || "An error occurred during text generation.");
         setLoadingDescription(false);
@@ -418,11 +423,28 @@ export default function MagicItemGenerator() {
           />
         </label>
 
-        <button type="submit" disabled={loadingDescription}>
-          {loadingDescription
-            ? "Generating Description..."
-            : "Generate Content"}
-        </button>
+        {canMakeRequest() ? (
+          <button type="submit" disabled={loadingDescription}>
+            {loadingDescription
+              ? "Generating Description..."
+              : "Generate Content"}
+          </button>
+        ) : (
+          <div>
+            <button type="submit" disabled={true}>
+              {loadingDescription
+                ? "Generating Description..."
+                : "Generate Content"}
+            </button>
+            <label>
+              You have exceeded the allowed number of generations.
+              <br />
+              Please wait until tomorrow to continue creating.
+              <br />
+              Thank you for using DnD Tools!
+            </label>
+          </div>
+        )}
       </form>
 
       {error && <p className="error">{error}</p>}
@@ -489,7 +511,7 @@ export default function MagicItemGenerator() {
                 id="less-button"
                 type="button"
                 onClick={handleLessPowerful}
-                disabled={loadingDescription}
+                disabled={loadingDescription || !canMakeRequest()}
                 className="phb-button"
               >
                 &#x2212; Less Powerful
@@ -498,7 +520,7 @@ export default function MagicItemGenerator() {
                 id="more-button"
                 type="button"
                 onClick={handleMorePowerful}
-                disabled={loadingDescription}
+                disabled={loadingDescription || !canMakeRequest()}
                 className="phb-button"
               >
                 More Powerful &#x2b;
