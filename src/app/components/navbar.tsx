@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function Navbar() {
   return (
@@ -9,6 +12,9 @@ export default function Navbar() {
         </li>
         <li style={liStyle}>
           <Link href="/magic-item-generator">Magic Item Generator</Link>
+        </li>
+        <li style={{ ...liStyle, marginLeft: "auto" }}>
+          <button onClick={() => signIn("google")}>Sign in with Google</button>
         </li>
       </ul>
     </nav>
