@@ -34,3 +34,10 @@ Ensure you have Node.js installed. We recommend using the latest LTS version.
 4. **Configuration**:
 
    You will have to add a .env file containing API keys and other configuration to get the app to run. Please see the .env.example for details.
+
+5. **Example**:
+
+   This is an example of the magic item generation page taken December 10th, 2024:
+
+   ![Example Screenshot 1](src/assets//README_demo_image_1.png)
+   ![Example Screenshot 2](src/assets/README_demo_image_2.png)
