@@ -39,5 +39,5 @@ Ensure you have Node.js installed. We recommend using the latest LTS version.
 
    This is an example of the magic item generation page taken December 10th, 2024:
 
-   ![Example Screenshot 1](src/assets//README_demo_image_1.png)
-   ![Example Screenshot 2](src/assets/README_demo_image_2.png)
+   ![Example Screenshot 1](public/assets/readme/README_demo_image_1.png)
+   ![Example Screenshot 2](public/assets/readme/README_demo_image_2.png)

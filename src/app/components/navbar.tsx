@@ -1,32 +1,35 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import styles from "../styles/navbar.module.css";
 
 export default function Navbar() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const darkModePreferred = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    setIsDarkMode(darkModePreferred);
+  }, []);
+
   return (
-    <nav style={navStyle}>
-      <ul style={ulStyle}>
-        <li style={liStyle}>
+    <nav className={`${styles.nav} ${isDarkMode ? styles.dark : styles.light}`}>
+      <ul className={styles.ul}>
+        <li className={styles.li}>
+          <Link href="/">Home</Link>
+        </li>
+        <li className={styles.li}>
+          <Link href="/magic-item-generator">Magic Item Generator</Link>
+        </li>
+        <li className={styles.li}>
           <Link href="/trap-generator">Trap Generator</Link>
         </li>
-        <li style={liStyle}>
-          <Link href="/magic-item-generator">Magic Item Generator</Link>
+        <li className={styles.li}>
+          <Link href="/npc-generator">NPC Generator</Link>
         </li>
       </ul>
     </nav>
   );
 }
-
-const navStyle = {
-  padding: "10px",
-  backgroundColor: "#333",
-};
-
-const ulStyle = {
-  display: "flex",
-  listStyleType: "none",
-  margin: 0,
-  padding: 0,
-};
-
-const liStyle = {
-  marginRight: "15px",
-};
