@@ -21,13 +21,13 @@ export default function Navbar() {
           <Link href="/">Home</Link>
         </li>
         <li className={styles.li}>
-          <Link href="/magic-item-generator">Magic Item Generator</Link>
+          <Link href="/magic-item-generator">Magic Items</Link>
         </li>
         <li className={styles.li}>
-          <Link href="/trap-generator">Trap Generator</Link>
+          <Link href="/trap-generator">Traps</Link>
         </li>
         <li className={styles.li}>
-          <Link href="/npc-generator">NPC Generator</Link>
+          <Link href="/npc-generator">NPCs</Link>
         </li>
       </ul>
     </nav>
