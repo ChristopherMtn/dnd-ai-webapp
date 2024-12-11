@@ -5,7 +5,8 @@ export async function generateImage(
   prompt: string,
   size: string,
   n: number = 1,
-  model: string = (process.env.IMAGE_GENERATION_MODEL as string) || "dall-e-2"
+  model: string = (process.env.OPENAI_IMAGE_GENERATION_MODEL as string) ||
+    "dall-e-2"
 ): Promise<string[]> {
   const response = await openai.images.generate({
     prompt,

@@ -1,30 +1,25 @@
-import { openai } from "./openaiClient";
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { TextModelManager } from "../models/textModelConfig";
 
 export async function generateText(
   systemPrompt: string,
   userPrompt: string,
-  model: string = (process.env.TEXT_GENERATION_MODEL as string) ||
-    "gpt-4o-mini",
+  textModelConfig: TextModelManager,
   temperature: number = 1.0
 ): Promise<string> {
-  console.log(`model: ${model}`);
-  const messages: ChatCompletionMessageParam[] = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: userPrompt },
-  ];
+  try {
+    const model = textModelConfig.instantiateModel(temperature);
 
-  const response = await openai.chat.completions.create({
-    model,
-    messages,
-    temperature,
-  });
+    const messages = [
+      new SystemMessage(systemPrompt),
+      new HumanMessage(userPrompt),
+    ];
 
-  const content = response.choices[0].message?.content;
+    const result = await model.invoke(messages);
 
-  if (!content) {
-    throw new Error("No content returned from OpenAI");
+    return result.content as string;
+  } catch (error) {
+    console.error("Error generating text:", error);
+    throw new Error("Failed to generate text. Please try again.");
   }
-
-  return content;
 }

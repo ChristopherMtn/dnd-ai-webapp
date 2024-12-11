@@ -3,6 +3,7 @@ import { GenerateTrapTextRequest, TrapOutput } from "@/app/types";
 import { generateTrapTextPrompts } from "@/app/prompts/trap";
 import { generateText } from "@/app/utils/textGenerator";
 import { handleApiError } from "@/app/utils/errorHandler";
+import { textModelConfig } from "@/app/models/textModelConfig";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,11 @@ export async function POST(request: NextRequest) {
 
     const { systemPrompt, userPrompt } = generateTrapTextPrompts(trapInput);
 
-    const responseContent = await generateText(systemPrompt, userPrompt);
+    const responseContent = await generateText(
+      systemPrompt,
+      userPrompt,
+      textModelConfig
+    );
 
     // Parse the OpenAI response into a TrapOutput object
     let trapOutput: TrapOutput;

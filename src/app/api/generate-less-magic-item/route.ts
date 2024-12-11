@@ -3,6 +3,7 @@ import { MagicItemOutput } from "@/app/types";
 import { generateText } from "@/app/utils/textGenerator";
 import { handleApiError } from "@/app/utils/errorHandler";
 import { generateMagicItemLessPowerfulTextPrompts } from "@/app/prompts/magic-item";
+import { textModelConfig } from "@/app/models/textModelConfig";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
     const responseContent = await generateText(
       systemPrompt,
       userPrompt,
-      undefined,
+      textModelConfig,
       0
     );
 
